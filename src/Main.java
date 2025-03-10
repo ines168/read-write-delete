@@ -18,23 +18,30 @@ public class Main {
             System.out.println("Unesite naziv kopirane datoteke:");
             String pathKopija = sc.nextLine();
             File outputFile = new File(pathKopija);
+            if (outputFile.exists()) {
+                System.out.println("\nOva datoteka već postoji. Jeste li sigurni daju želite overwritati (D/N)?");
+                String brisanje = sc.nextLine().toLowerCase();
+                if (brisanje.equals("d")) {
+                    brisanjeDatoteke(outputFile, pathKopija);
+                } else {
+                    System.out.println("Izlazim iz programa...");
+                    return;
+                }
+            }
 
             try (FileInputStream ulaz = new FileInputStream(inputFile); FileOutputStream izlaz = new FileOutputStream(outputFile)) {
+                //byte[] bytes = new byte[(int) inputFile.length()];
                 byte[] bytes = new byte[8];
-                int b;
-                while ((b = ulaz.read(bytes)) != -1) {
-                    izlaz.write(bytes, 0, b);
+                while (ulaz.read(bytes) != -1) {
+                    izlaz.write(bytes);
                 }
+                System.out.println("\nDatoteka " + pathOriginal + " je uspješno kopirana!");
             }
             if (outputFile.exists()) {
                 System.out.println("Želite li izbrisati kopiju datoteke (D/N)?");
                 String brisanje = sc.nextLine().toLowerCase();
                 if (brisanje.equals("d")) {
-                    if (outputFile.delete()) {
-                        System.out.println("Datoteka " + pathKopija + " je izbrisana.");
-                    } else {
-                        throw new FailedToDelete("Nismo mogli obrisati kopiju vaše datoteke.");
-                    }
+                    brisanjeDatoteke(outputFile, pathKopija);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -47,6 +54,14 @@ public class Main {
             System.err.println("Došlo je do greške prilikom čitanja ili pisanja datoteke: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Došlo je do neočekivane greške: " + e.getMessage());
+        }
+    }
+
+    public static void brisanjeDatoteke(File file, String filePath) throws FailedToDelete {
+        if (file.delete()) {
+            System.out.println("\nDatoteka " + filePath + " je izbrisana.");
+        } else {
+            throw new FailedToDelete("Nismo mogli obrisati kopiju vaše datoteke.");
         }
     }
 }
