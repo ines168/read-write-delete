@@ -12,6 +12,9 @@ public class Main {
             if (!inputFile.exists()) {
                 throw new FileNotFoundException("Nismo mogli pronaći datoteku koju želite kopirati.");
             }
+            if (!inputFile.canRead()) {
+                throw new SecurityException("Nemate prava čitati ovu datoteku.");
+            }
             System.out.println("Unesite naziv kopirane datoteke:");
             String pathKopija = sc.nextLine();
             File outputFile = new File(pathKopija);
@@ -38,6 +41,8 @@ public class Main {
             System.err.println("Nismo mogli pronaći datoteku koju želite kopirati.");
         } catch (FailedToDelete e) {
             System.err.println("Greška! " + e.getMessage());
+        } catch (SecurityException e) {
+            System.err.println(e.getMessage());
         } catch (IOException e) {
             System.err.println("Došlo je do greške prilikom čitanja ili pisanja datoteke: " + e.getMessage());
         } catch (Exception e) {
